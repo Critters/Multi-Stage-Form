@@ -1,0 +1,210 @@
+<html>
+<head>
+    <title>Multi Stage Form</title>
+    <script language="javascript">
+        let stage = 0;
+        let stageNames = ["username", "email", "password", "checkbox"];
+
+        function validateUsername(_submit){
+            clearErrorsAndValids();
+            var username = getInput("username");
+            if(checkLength(username, 3, 10)){
+                if(_submit) {
+                    showSection(1);
+                }else{
+                    showValid("username");
+                }
+            }else{
+                showError("username", "Must be between 3 and 10 characters long");
+            }
+        }
+
+        function validateEmail(_submit){
+            clearErrorsAndValids();
+            var email = getInput("email");
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+                if(_submit) showSection(2);
+                showValid("email");
+            }else{
+                if(_submit) showError("email");
+            }
+        }
+
+        function validatePassword(_submit){
+            clearErrorsAndValids();
+            var password = getInput("password");
+            if(checkLength(password, 5, 99)){
+                if(_submit) {
+                    showSection(3);
+                }else{
+                    showValid("password");
+                }
+            }else{
+                showError("password");
+            }
+        }
+
+        function validateCheck(){
+            clearErrorsAndValids();
+            var agree = document.getElementById("input.checkbox").checked;
+            if(agree){
+                submitForm();
+            }else{
+                showError("checkbox");
+            }
+        }
+
+        function submitForm(){
+            document.getElementById("allSteps").style.display = "none";
+            document.getElementById("allDone").innerHTML = "Sending data to the FBI: <br>\
+                Username: "+getInput("username")+"<br>\
+                Email:  "+getInput("email")+"<br>\
+                Password: hunter2<br><br><h1>I was quite rusty :)</h1><img src='rusty.png'>";
+            document.getElementById("allDone").style.display = "block";
+        }
+
+        function getInput(_stageName){
+            return document.getElementById("input."+_stageName).value.trim();
+        }
+
+        function checkLength(_value, _min, _max){
+            var username = document.getElementById("input.username").value;
+            if(_value.length < _min || _value.length > _max)
+                return false;
+            return true;
+        }
+
+        function showSection(_sectionID){
+            var i = 0;
+            stageNames.forEach(function(stage){
+                if(document.getElementById("edit."+stage))
+                    document.getElementById("edit."+stage).style.display = (_sectionID > i)?"inline":"none";
+                document.getElementById("section."+stage).style.display = (stage == stageNames[_sectionID])?"block":"none";
+                i++;
+            });
+        }
+
+        function clearErrorsAndValids(){
+            stageNames.forEach(function(stage){
+                document.getElementById("message."+stage).style.display = "block";
+                document.getElementById("error."+stage).style.display = "none";
+                if(document.getElementById("valid."+stage)) 
+                    document.getElementById("valid."+stage).style.display = "none";
+            });
+        }
+
+        function showError(_stage){
+            document.getElementById("message."+_stage).style.display = "none"
+            document.getElementById("error."+_stage).style.display = "block"
+        }
+
+        function showValid(_stage){
+            if(document.getElementById("valid."+_stage)) {
+                document.getElementById("message."+_stage).style.display = "none"
+                document.getElementById("valid."+_stage).style.display = "block"
+            }
+        }
+    </script>
+    <style>
+        input[type=text],input[type=password]{
+            width:200px;
+            padding:12px;
+            margin: 8px 0px;
+            border: solid 1px #CCCCCC;
+            border-radius: 4px;
+        }
+        .next {
+            width: 80px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit{
+            background-color: #CCCCCC;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            vertical-align: middle;
+            display: none;
+        }
+        .title {
+            font-size:24px;
+            width:100%;
+            height:30px;
+        }
+        .section{
+            border: 1px dotted #444444;
+            padding:10px;
+        }
+        span.errors{
+            color: #FF0000;
+            display:none;
+        }
+        span.valids{
+            color: #075bbb;
+            display:none;
+        }
+    </style>
+</head>
+<body>
+    <div id="allSteps">
+        <div class="section">
+            <div class="title">
+                <input type="button" value="edit" id="edit.username" class="edit" onClick="showSection(0)">
+                1: <span id="title.username">Username</span>
+            </div>
+            <div id="section.username">
+                <span id="message.username" style="display:block;">Pick a username between 3 and 10 characters in length</span>
+                <span id="error.username" class="errors">Must be between 3 and 10 characters long</span>
+                <span id="valid.username" class="valids">Looking good</span>
+                <input id="input.username" placeholder="Username" type="text" name="username" oninput="validateUsername(false)">
+                <input type="button" class="next" onClick="validateUsername(true)" value="Next">
+            </div>
+        </div>
+        <div class="section">
+            <div id="title.email" class="title">
+                <input type="button" value="edit" id="edit.email" class="edit" onClick="showSection(1)">
+                2: <span id="title.email">Email Address</span>
+            </div>
+            <div id="section.email" style="display:none;">
+                <span id="message.email" style="display:block;">Please enter your email address</span>
+                <span id="error.email" class="errors" style="display:none;">That looks suspiciously fake</span>
+                <span id="valid.email" class="valids">Looking good</span>
+                <input id="input.email" placeholder="Email Address" type="text" name="email" oninput="validateEmail(false)">
+                <input type="button" class="next" onClick="validateEmail(true)" value="Next">
+            </div>
+        </div>
+        <div class="section">
+            <div id="title.password" class="title">
+                <input type="button" value="edit" id="edit.password" class="edit" onClick="showSection(2)">
+                3: Password
+            </div>
+            <div id="section.password" style="display:none;">
+                <span id="message.password" style="display:block;">Please enter a secure password</span>
+                <span id="error.password" class="errors" style="display:none;">Passwords need to be at least 5 characters long</span>
+                <span id="valid.password" class="valids">Looking good</span>
+                <input id="input.password" placeholder="Password" type="password" name="password" oninput="validatePassword(false)">
+                <input type="button" class="next" onClick="validatePassword(true)" value="Next">
+            </div>
+        </div>
+        <div class="section">
+            <div id="title.checkbox" class="title">
+                4: Confirm
+            </div>
+            <div id="section.checkbox" style="display:none;">
+                <span id="message.checkbox" style="display:block;"></span><input id="input.checkbox" type="checkbox" name="agree"> I give you the rights to all the things
+                <span id="error.checkbox" class="errors" style="display:none;">Go on, you've come this far!</span>
+                <hr>
+                <input type="button" class="next" onClick="validateCheck()" value="Finish">
+            </div>
+        </div>
+    </div>
+    <div id="allDone" style="border: solid 1px red; display:none;">
+    </div>
+</body>
+</html>
